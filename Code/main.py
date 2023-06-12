@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
 
 
 dataset = pd.read_csv('TimePerceptionV6.csv')
@@ -23,7 +25,7 @@ model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=1000)
+history = model.fit(x_train, y_train, epochs=500)
 
 model.evaluate(x_test, y_test)
 
@@ -43,4 +45,19 @@ print(z)
 df = pd.read_csv('TimePerceptionV6.csv')
 
 fig = px.bar(df, x='Sleep (h)', y='Delta', title='Time Perception Madness')
-fig.show()
+#fig.show()
+
+fig2 = px.bar(df, x='Sleep (h)', y='Delta', color='Time of Day (%)',title='Time Perception Madness')
+fig2.show()
+
+df = pd.read_csv('TimePerceptionV6.csv', delimiter=',', encoding='utf-8')
+fig3 = go.Figure()
+fig3.add_trace(go.Scatter(x=df['Sleep (h)'], y=df['Delta'], mode='markers', name ='Linear'))
+
+coefficients = np.polyfit(df['Sleep (h)'], df['Delta'], 1)
+line_of_best_fit = np.polyval(coefficients, df['Sleep (h)'])
+
+fig3.add_trace(go.Scatter(x=df['Sleep (h)'], y=line_of_best_fit, line=dict(color='rgb(255,0,0)'), mode='lines', name='Line of Best Fit'))
+fig3.update_layout(title='Time Perception Madness')
+fig3.update_layout(xaxis_title='Sleep (h)', yaxis_title='Delta')
+fig3.show()
